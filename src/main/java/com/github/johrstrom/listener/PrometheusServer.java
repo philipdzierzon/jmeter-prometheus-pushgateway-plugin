@@ -33,32 +33,34 @@ import java.util.zip.GZIPOutputStream;
  * HTTPServer server = new HTTPServer(1234);
  * }
  * </pre>
- * */
+ */
 public class PrometheusServer {
-	
-	public static final String PROMETHEUS_PORT = "prometheus.port";
-	public static final int PROMETHEUS_PORT_DEFAULT = 9270;
-	
-	public static final String PROMETHEUS_DELAY = "prometheus.delay";
-	public static final int PROMETHEUS_DELAY_DEFAULT = 0;
 
-	public static final String PROMETHEUS_IP = "prometheus.ip";
-	public static final String PROMETHEUS_IP_DEFAULT = "127.0.0.1";
+    public static final String PROMETHEUS_PORT = "prometheus.port";
+    public static final int PROMETHEUS_PORT_DEFAULT = 9270;
 
-	private static final Logger log = LoggerFactory.getLogger(PrometheusServer.class);
+    public static final String PROMETHEUS_DELAY = "prometheus.delay";
+    public static final int PROMETHEUS_DELAY_DEFAULT = 0;
 
-	private static class LocalByteArray extends ThreadLocal<ByteArrayOutputStream> {
-	    protected ByteArrayOutputStream initialValue() {
-	        return new ByteArrayOutputStream(1 << 20);
-	    }
-	}
+    public static final String PROMETHEUS_IP = "prometheus.ip";
+    public static final String PROMETHEUS_IP_DEFAULT = "127.0.0.1";
+
+    private static final Logger log = LoggerFactory.getLogger(PrometheusServer.class);
+
+    private static class LocalByteArray extends ThreadLocal<ByteArrayOutputStream> {
+
+        protected ByteArrayOutputStream initialValue() {
+            return new ByteArrayOutputStream(1 << 20);
+        }
+    }
 
     static class HTTPMetricHandler implements HttpHandler {
+
         private CollectorRegistry registry;
         private final LocalByteArray response = new LocalByteArray();
 
         HTTPMetricHandler(CollectorRegistry registry) {
-          this.registry = registry;
+            this.registry = registry;
         }
 
 
@@ -96,7 +98,9 @@ public class PrometheusServer {
 
     protected static boolean shouldUseCompression(HttpExchange exchange) {
         List<String> encodingHeaders = exchange.getRequestHeaders().get("Accept-Encoding");
-        if (encodingHeaders == null) return false;
+        if (encodingHeaders == null) {
+            return false;
+        }
 
         for (String encodingHeader : encodingHeaders) {
             String[] encodings = encodingHeader.split(",");
@@ -129,41 +133,42 @@ public class PrometheusServer {
     private int delay = JMeterUtils.getPropDefault(PROMETHEUS_DELAY, PROMETHEUS_DELAY_DEFAULT);
     private String ip = JMeterUtils.getPropDefault(PROMETHEUS_IP, PROMETHEUS_IP_DEFAULT);
 
-    protected static final HTTPMetricHandler metricHandler = new HTTPMetricHandler(JMeterCollectorRegistry.getInstance());
+    protected static final HTTPMetricHandler metricHandler = new HTTPMetricHandler(
+            JMeterCollectorRegistry.getInstance());
 
     public synchronized static PrometheusServer getInstance() {
-    	if(instance == null) {
-    		log.debug("Creating Prometheus Server");
-    		instance = new PrometheusServer();
-    	}
-    	
-    	return instance;
+        if (instance == null) {
+            log.debug("Creating Prometheus Server");
+            instance = new PrometheusServer();
+        }
+
+        return instance;
     }
 
-    private PrometheusServer() { }
-    
+    private PrometheusServer() {
+    }
+
     public synchronized void start() throws IOException {
-    	if(server != null){
-    		server.stop(0);
+        if (server != null) {
+            server.stop(0);
             ((ExecutorService) this.server.getExecutor()).shutdown();
-    	}
+        }
 
         server = HttpServer.create();
         InetSocketAddress addr = new InetSocketAddress(InetAddress.getByName(ip), port);
-        
+
         server.bind(addr, 3);
 
         server.createContext("/", metricHandler);
         server.createContext("/metrics", metricHandler);
-        
 
         server.setExecutor(Executors.newSingleThreadExecutor());
-        server.start();      
+        server.start();
     }
-    
+
     public synchronized void stop() {
-    	server.stop(delay);
-    	((ExecutorService) this.server.getExecutor()).shutdown();
+        server.stop(delay);
+        ((ExecutorService) this.server.getExecutor()).shutdown();
     }
 
 }
