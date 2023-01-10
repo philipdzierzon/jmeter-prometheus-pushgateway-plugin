@@ -23,7 +23,7 @@ public class JMeterCollectorRegistry extends CollectorRegistry {
             JMeterUtils.getPropDefault(ThreadCollector.COLLECT_THREADS, ThreadCollector.COLLECT_THREADS_DEFAULT);
 
     public static final String COLLECT_JVM = "prometheus.save.jvm";
-    public static final boolean COLLECT_JVM_DEFAULT = true;
+    public static final boolean COLLECT_JVM_DEFAULT = false;
     private static final boolean saveJVM = JMeterUtils.getPropDefault(COLLECT_JVM, COLLECT_JVM_DEFAULT);
 
 
