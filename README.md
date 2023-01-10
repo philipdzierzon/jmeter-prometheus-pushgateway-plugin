@@ -1,5 +1,3 @@
-[![Build Status](https://travis-ci.org/johrstrom/jmeter-prometheus-plugin.png?branch=master)](travis)
-[![Current Version](https://img.shields.io/maven-central/v/com.github.johrstrom/jmeter-prometheus-plugin.svg)](maven-central)
 
 # Prometheus Listener for Jmeter
 
@@ -138,52 +136,6 @@ To overrider properties, add the Properties in the jmeter.properties file (JMETE
 |  prometheus.save.threads.name   | jmeter\_threads |       The name of the metric describing jmeter threads        |
 |       prometheus.save.jvm       |      false      |                 Collect metrics from the JVM                  |
 | prometheus.pushOnSampleOccurred |      false      |          Pushes collected metrics after each sample           |
-
-# Download
-
-## Maven Dependency
-
-We're now hosted on maven central! If you want to download this jar in a maven style project, simply add this dependency:
-
-```xml
-    <!-- you'll have to specify jmeter-prometheus-plugin.version here -->
-    <dependency>
-      <groupId>com.github.johrstrom</groupId>
-      <artifactId>jmeter-prometheus-plugin</artifactId>
-      <version>${jmeter-prometheus-plugin.version}</version>
-    </dependency>
-```
-
-## Programatically
-
-This URL below seems to be the only way to download jars from maven through `curl` or `wget`.  Again, replace `0.6.0` here with the
-current version, which can be viewed at the top of this README.
-
-`https://search.maven.org/remotecontent?filepath=com/github/johrstrom/jmeter-prometheus-plugin/0.6.0/jmeter-prometheus-plugin-0.6.0.jar`
-
-## Web Browser
-
-Search [maven central](https://search.maven.org/search?q=a:jmeter-prometheus-plugin) to get the latest version.
-
-This project is hosted [here](https://oss.sonatype.org/content/groups/public/com/github/johrstrom/jmeter-prometheus-plugin/) on 
-[OSS sonatype org](https://oss.sonatype.org).
-
-## Verifying
-
-I sign these release jars so you can verify with this method (of course the version is going to change):
-
-```bash
-gpg --verify jmeter-prometheus-plugin-0.5.0.jar.asc
-```
-
-You should see output similar to this.
-
-```bash
-gpg: assuming signed data in 'jmeter-prometheus-plugin-0.5.0.jar'
-gpg: Signature made Thu 22 Aug 2019 09:35:15 PM EDT
-gpg:                using RSA key 6F5EAC674B279301932EC1FEAC2AEC6C76D4AF12
-gpg: Good signature from "Jeff Ohrstrom (Jeff Ohrstrom's personal key) <johrstrom@hotmail.com>" [ultimate]
-```
 
 # Building
 
