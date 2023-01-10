@@ -19,8 +19,8 @@ public class CountTypeUpdater extends AbstractUpdater {
 
     private static final Logger log = LoggerFactory.getLogger(CountTypeUpdater.class);
 
-    public CountTypeUpdater(ListenerCollectorConfig cfg) {
-        super(cfg);
+    public CountTypeUpdater(ListenerCollectorConfig config) {
+        super(config);
     }
 
     @Override
@@ -78,9 +78,9 @@ public class CountTypeUpdater extends AbstractUpdater {
         }
     }
 
-    protected void updateAssertions(AssertionContext ctx) {
-        String[] labels = this.labelValues(ctx);
-        boolean successful = !ctx.assertion.isFailure();
+    protected void updateAssertions(AssertionContext assertionContext) {
+        String[] labels = this.labelValues(assertionContext);
+        boolean successful = !assertionContext.assertion.isFailure();
 
         this.inc(labels, successful);
     }

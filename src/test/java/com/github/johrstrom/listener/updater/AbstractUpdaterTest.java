@@ -20,7 +20,7 @@ public class AbstractUpdaterTest {
 		}
 
 		@Override
-		public void update(SampleEvent e) {
+		public void update(SampleEvent event) {
 			// do nothing
 		}
 	}

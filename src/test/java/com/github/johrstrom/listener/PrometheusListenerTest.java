@@ -61,21 +61,9 @@ public class PrometheusListenerTest {
 
 	}
 
-	@Test
-	public void lazyInizializationPrometheusServer() throws NoSuchFieldException, IllegalAccessException {
-
-		PrometheusListener listener = new PrometheusListener();
-		// Remove the server to test lazy initialization on test start
-		Field prometheusServerField = listener.getClass().getDeclaredField("server");
-		prometheusServerField.setAccessible(true);
-		prometheusServerField.set(listener, null);
-		listener.setCollectorConfigs(TestUtilities.simpleListListener());
-		listener.testStarted();
-		Assert.assertNotNull(prometheusServerField.get(listener));
-	}
 
 	@Test
-	public void lazyInizializationRegistry() throws NoSuchFieldException, IllegalAccessException {
+	public void lazyInitializationRegistry() throws NoSuchFieldException, IllegalAccessException {
 
 		PrometheusListener listener = new PrometheusListener();
 		// Remove the server to test lazy initialization on test start

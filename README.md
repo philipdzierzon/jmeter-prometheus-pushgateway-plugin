@@ -131,14 +131,13 @@ This plugin has limited "out of the box" functionality because it gives you, the
 # Properties you can override
 To overrider properties, add the Properties in the jmeter.properties file (JMETER_HOME/bin folder) and restart Jmeter to take effect
 
-|           Property           |     default     |                               description                               |
-|:----------------------------:|:---------------:|:-----------------------------------------------------------------------:|
-|       prometheus.port        |      9270       |                  The port the http server will bind to                  |
-|        prometheus.ip         |    127.0.0.1    |   The ip the http server will bind to. Containers may need `0.0.0.0`    |
-|       prometheus.delay       |        0        | The delay (in seconds) the http server will wait before being destroyed |
-|   prometheus.save.threads    |      true       |      True or false value to save and collect jmeter thread metrics      |
-| prometheus.save.threads.name | jmeter\_threads |            The name of the metric describing jmeter threads             |
-|     prometheus.save.jvm      |      false      |                      Collect metrics from the JVM                       |
+|            Property             |     default     |                          description                          |
+|:-------------------------------:|:---------------:|:-------------------------------------------------------------:|
+|          prometheus.ip          | 127.0.0.1:3002  |          The ip and port of the target push gateway           |
+|     prometheus.save.threads     |      true       | True or false value to save and collect jmeter thread metrics |
+|  prometheus.save.threads.name   | jmeter\_threads |       The name of the metric describing jmeter threads        |
+|       prometheus.save.jvm       |      false      |                 Collect metrics from the JVM                  |
+| prometheus.pushOnSampleOccurred |      false      |          Pushes collected metrics after each sample           |
 
 # Download
 

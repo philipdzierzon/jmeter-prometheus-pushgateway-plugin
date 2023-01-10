@@ -33,6 +33,7 @@ import org.apache.jmeter.samplers.SampleListener;
 import org.apache.jmeter.testelement.TestStateListener;
 import org.apache.jmeter.testelement.property.CollectionProperty;
 import org.apache.jmeter.testelement.property.JMeterProperty;
+import org.apache.jmeter.util.JMeterUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +51,11 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
 
     private static final Logger log = LoggerFactory.getLogger(PrometheusListener.class);
 
-    private transient PrometheusServer server = PrometheusServer.getInstance();
+    private static final String PROMETHEUS_PUSH_ON_SAMPLE_OCCURRED = "prometheus.pushOnSampleOccurred";
+    private static final boolean PROMETHEUS_PUSH_ON_SAMPLE_OCCURRED_DEFAULT = false;
+    private final boolean pushOnSampleOccurred = JMeterUtils.getPropDefault(PROMETHEUS_PUSH_ON_SAMPLE_OCCURRED,
+            PROMETHEUS_PUSH_ON_SAMPLE_OCCURRED_DEFAULT);
+    private final transient PrometheusGatewayPusher prometheusGatewayPusher = PrometheusGatewayPusher.getInstance();
 
     private List<AbstractUpdater> updaters;
 
@@ -67,6 +72,9 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
             updater.update(event);
         }
 
+        if (pushOnSampleOccurred) {
+            prometheusGatewayPusher.pushMetricsToGateway();
+        }
     }
 
     /*
@@ -100,13 +108,8 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
      */
     @Override
     public void testEnded() {
+        prometheusGatewayPusher.pushMetricsToGateway();
         this.clearCollectors();
-
-        try {
-            this.server.stop();
-        } catch (Exception e) {
-            log.error("Couldn't stop http server", e);
-        }
     }
 
     /*
@@ -129,18 +132,6 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
     public void testStarted() {
         // update the configuration
         this.makeNewCollectors();
-        // this.registerAllCollectors();
-
-        try {
-            if (server == null) {
-                log.warn("Prometheus server has not yet been initialized, doing it now");
-                server = PrometheusServer.getInstance();
-            }
-            server.start();
-        } catch (Exception e) {
-            log.error("Couldn't start http server", e);
-        }
-
     }
 
     /*
@@ -156,12 +147,11 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
 
     @Override
     protected void makeNewCollectors() {
-        // this.clearCollectors();
         if (this.registry == null) {
             log.warn("Collector registry has not yet been initialized, doing it now");
             registry = JMeterCollectorRegistry.getInstance();
         }
-        this.updaters = new ArrayList<AbstractUpdater>();
+        this.updaters = new ArrayList<>();
 
         CollectionProperty collectorDefs = this.getCollectorConfigs();
 
@@ -169,7 +159,7 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
 
             try {
                 ListenerCollectorConfig config = (ListenerCollectorConfig) collectorDef.getObjectValue();
-                log.debug("Creating collector from configuration: " + config);
+                log.debug("Creating collector from configuration: {}", config);
                 Collector collector = this.registry.getOrCreateAndRegister(config);
                 AbstractUpdater updater = null;
 
@@ -189,14 +179,15 @@ public class PrometheusListener extends CollectorElement<ListenerCollectorConfig
                         break;
                     default:
                         // hope our IDEs are telling us to use all possible enums!
-                        log.error(config.getMeasuringAsEnum() + " triggered default case, which means there's "
-                                + "no functionality for this and is likely a bug");
+                        log.error(
+                                "{} triggered default case, which means there's no functionality for this and is likely a bug",
+                                config.getMeasuringAsEnum());
                         break;
                 }
 
                 this.collectors.put(config, collector);
                 this.updaters.add(updater);
-                log.debug("added " + config.getMetricName() + " to list of collectors");
+                log.debug("added {} to list of collectors", config.getMetricName());
 
             } catch (Exception e) {
                 log.error("Didn't create new collector because of error, ", e);
